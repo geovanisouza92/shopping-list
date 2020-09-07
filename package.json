@@ -3,11 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@blueprintjs/core": "^3.31.0",
+    "aws-amplify": "^3.1.1",
+    "classnames": "^2.2.6",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@blueprintjs/eslint-config": "^0.5.0",
+    "@blueprintjs/eslint-plugin": "^0.2.2",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "babel-eslint": "^10.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.3.0",
+    "lint-staged": "^10.3.0",
+    "prettier": "^2.1.1",
     "react-scripts": "3.4.3"
   },
   "scripts": {
@@ -17,7 +30,17 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "prettier",
+      "prettier/react",
+      "@blueprintjs/eslint-config"
+    ],
+    "parser": "babel-eslint",
+    "plugins": [
+      "prettier",
+      "@blueprintjs/eslint-plugin"
+    ]
   },
   "browserslist": {
     "production": [
@@ -29,6 +52,16 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "eslint --fix"
     ]
   }
 }

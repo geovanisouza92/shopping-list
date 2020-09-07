@@ -1,11 +1,19 @@
+import Amplify from 'aws-amplify';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { App } from './App';
+import config from './aws-exports';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
+import { ToasterProvider } from './Toaster';
+
+Amplify.configure(config);
 
 ReactDOM.render(
   <React.StrictMode>
-    <React.Fragment />
+    <ToasterProvider>
+      <App />
+    </ToasterProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

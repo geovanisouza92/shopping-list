@@ -1,8 +1,11 @@
+import { Classes } from '@blueprintjs/core';
+import classNames from 'classnames';
 import React from 'react';
 import { Api, showApiError } from './api';
 import styles from './App.module.css';
 import { Header } from './Header';
 import { List } from './List';
+import { useTheme } from './Theme';
 import { useToaster } from './Toaster';
 
 export const App = () => {
@@ -10,6 +13,7 @@ export const App = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [items, setItems] = React.useState([]);
   const [showError] = useToaster();
+  const { useDarkTheme } = useTheme();
 
   React.useEffect(() => {
     (async () => {
@@ -65,7 +69,10 @@ export const App = () => {
   };
 
   return (
-    <div className={styles.app}>
+    <div className={classNames(styles.app, {
+      [styles.appDark]: useDarkTheme,
+      [Classes.DARK]: useDarkTheme,
+    })}>
       <Header
         onAddNewItem={handleAddNewItem}
         isLoading={isLoading}

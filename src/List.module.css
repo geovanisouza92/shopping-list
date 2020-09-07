@@ -2,6 +2,6 @@
   padding-left: 0;
 }
 
-.checkbox {
+.checkbox.root {
   flex-grow: 1;
 }

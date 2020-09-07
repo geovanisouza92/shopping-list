@@ -1,6 +1,6 @@
-import React from 'react';
-import { Classes, ControlGroup, Checkbox, Button, Intent } from '@blueprintjs/core';
+import { Button, Checkbox, Classes, ControlGroup, Intent } from '@blueprintjs/core';
 import classNames from 'classnames';
+import React from 'react';
 import styles from './List.module.css';
 
 export const List = ({ items, onToggleItem, onDeleteItem, isLoading }) => (
@@ -8,7 +8,7 @@ export const List = ({ items, onToggleItem, onDeleteItem, isLoading }) => (
     {items.map(item => (
       <ControlGroup key={`item-${item.id}`}>
         <Checkbox
-          className={classNames(styles.checkbox, {
+          className={classNames(styles.checkbox, styles.root, {
             [Classes.SKELETON]: isLoading,
           })}
           label={item.name}

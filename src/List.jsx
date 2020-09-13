@@ -34,6 +34,11 @@ export const List = ({ items, onToggleItem, onDeleteItem }) => (
         key={item.id}
         in={!item.isHidden}
         appear
+        timeout={{
+          appear: 500,
+          enter: 500,
+          exit: 300,
+        }}
         classNames={animationClasses}
       >
         <ControlGroup>

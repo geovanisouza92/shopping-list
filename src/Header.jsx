@@ -13,7 +13,7 @@ export const Header = ({ onAddNewItem }) => {
   const isFetching = useIsFetching();
 
   return (
-    <div>
+    <>
       <div className={styles.header}>
         <H1>Shopping list</H1>
         {isFetching ? (
@@ -36,7 +36,7 @@ export const Header = ({ onAddNewItem }) => {
           onChange={e => setValue(e.target.value)}
         />
       </form>
-    </div>
+    </>
   );
 };
 

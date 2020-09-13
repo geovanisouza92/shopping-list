@@ -14,20 +14,20 @@ export const resumeApiError = (obj) => {
 
 export const Api = {
   async listItems() {
-    const { data = [] } = await API.graphql(graphqlOperation(listItems));
-    return data.listItems.items;
+    const { data } = await API.graphql(graphqlOperation(listItems));
+    return data?.listItems?.items ?? [];
   },
   async createItem({ name }) {
     const { data } = await API.graphql(graphqlOperation(createItem, {
       input: { name },
     }));
-    return data.createItem;
+    return data?.createItem;
   },
   async updateItem({ id, name, done }) {
     const { data } = await API.graphql(graphqlOperation(updateItem, {
       input: { id, name, done },
     }));
-    return data.updateItem;
+    return data?.updateItem;
   },
   async deleteItem({ id }) {
     await API.graphql(graphqlOperation(deleteItem, {

@@ -1,6 +1,12 @@
 @import "~normalize.css";
 @import "~@blueprintjs/core/lib/css/blueprint.css";
 @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+@import "~@blueprintjs/core/lib/scss/variables";
+
+html,
+body {
+  height: 100%;
+}
 
 body {
   margin: 0;
@@ -17,12 +23,14 @@ code {
     monospace;
 }
 
-:root {
-  --dark-background: #293742;
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: var(--dark-background);
+    background-color: $pt-dark-app-background-color;
   }
 }

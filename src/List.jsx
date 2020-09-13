@@ -1,29 +1,59 @@
-import { Button, Checkbox, Classes, ControlGroup, Intent } from '@blueprintjs/core';
+import { Button, Checkbox, ControlGroup, Intent } from '@blueprintjs/core';
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 import React from 'react';
-import styles from './List.module.css';
+import { CSSTransition } from 'react-transition-group';
+import styles from './List.module.scss';
 
-export const List = ({ items, onToggleItem, onDeleteItem, isLoading }) => (
+const propTypes = {
+  items: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    done: PropTypes.bool,
+  })).isRequired,
+  onToggleItem: PropTypes.func.isRequired,
+  onDeleteItem: PropTypes.func.isRequired,
+};
+
+const animationClasses = {
+  appear: styles.itemAppear,
+  appearActive: styles.itemAppearActive,
+  appearDone: styles.itemAppearDone,
+  enter: styles.itemEnter,
+  enterActive: styles.itemEnterActive,
+  enterDone: styles.itemEnterDone,
+  exit: styles.itemExit,
+  exitActive: styles.itemExitActive,
+  exitDone: styles.itemExitDone,
+};
+
+export const List = ({ items, onToggleItem, onDeleteItem }) => (
   <ul className={styles.list}>
-    {items.map(item => (
-      <ControlGroup key={`item-${item.id}`}>
-        <Checkbox
-          className={classNames(styles.checkbox, styles.root, {
-            [Classes.SKELETON]: isLoading,
-          })}
-          label={item.name}
-          checked={item.done}
-          onChange={e => onToggleItem(item.id, !item.done)}
-          large
-        />
-        <Button
-          minimal
-          disabled={isLoading}
-          intent={Intent.DANGER}
-          icon="delete"
-          onClick={e => onDeleteItem(item.id)}
-        />
-      </ControlGroup>
+    {items.map((item) => (
+      <CSSTransition
+        key={item.id}
+        in={!item.isHidden}
+        appear
+        classNames={animationClasses}
+      >
+        <ControlGroup>
+          <Checkbox
+            className={classNames(styles.checkbox, styles.root)}
+            label={item.name}
+            checked={item.done}
+            onChange={e => onToggleItem(item.id, !item.done)}
+            large
+          />
+          <Button
+            minimal
+            intent={Intent.DANGER}
+            icon="delete"
+            onClick={e => onDeleteItem(item)}
+          />
+        </ControlGroup>
+      </CSSTransition>
     ))}
   </ul>
 );
+
+List.propTypes = propTypes;

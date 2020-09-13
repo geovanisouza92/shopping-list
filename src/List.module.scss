@@ -1,0 +1,33 @@
+.list {
+  padding-left: 0;
+}
+
+.checkbox.root {
+  flex-grow: 1;
+}
+
+.itemAppear,
+.itemEnter {
+  opacity: 0;
+  height: 0;
+}
+
+.itemAppearActive,
+.itemAppearDone,
+.itemEnterActive,
+.itemEnterDone {
+  opacity: 1;
+  height: auto;
+  transition: opacity 500ms, height 500ms;
+}
+
+.itemExit {
+  opacity: 1;
+}
+
+.itemExitActive,
+.itemExitDone {
+  opacity: 0;
+  height: 0;
+  transition: opacity 300ms, height 300ms;
+}

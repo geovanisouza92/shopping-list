@@ -1,37 +1,66 @@
 import { Classes } from '@blueprintjs/core';
 import classNames from 'classnames';
 import React from 'react';
-import { Api, showApiError } from './api';
-import styles from './App.module.css';
+import { queryCache, useMutation, useQuery } from 'react-query';
+import { Api, resumeApiError } from './api';
+import styles from './App.module.scss';
 import { Header } from './Header';
 import { List } from './List';
 import { useTheme } from './Theme';
 import { useToaster } from './Toaster';
 
+const byNameAsc = (a, z) => a.name.localeCompare(z.name);
+
+const useHiddenMap = () => {
+  const [hiddenMap, setHiddenMap] = React.useState(new Map());
+  return {
+    isHidden: (token) => hiddenMap.has(token),
+    remember: (token) => setHiddenMap((prevMap) => {
+      prevMap.set(token, true);
+      return prevMap;
+    }),
+    forget: (token) => setHiddenMap((prevMap) => {
+      prevMap.delete(token);
+      return prevMap;
+    }),
+  }
+};
+
 export const App = () => {
-  const [isInitializing, setIsInitializing] = React.useState(true);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [items, setItems] = React.useState([]);
-  const [showError] = useToaster();
+  const { isError, error, data: items = [] } = useQuery('items', Api.listItems, {
+    refetchOnWindowFocus: false,
+  });
+  const setItems = (newItems) => queryCache.setQueryData('items', newItems);
+  const [createItem] = useMutation(Api.createItem, {
+    onSuccess: (createdItem) => setItems(items.concat(createdItem)),
+  });
+  const [updateItem] = useMutation(Api.updateItem, {
+    onSuccess(updatedItem) {
+      const index = items.findIndex(item => item.id === updatedItem.id);
+      if (index === -1) return;
+      const newItems = items.slice(0, index)
+        .concat(updatedItem)
+        .concat(items.slice(index + 1));
+      setItems(newItems);
+    }
+  });
+  const [deleteItem] = useMutation(Api.deleteItem, {
+    onSuccess: (_, { id }) => setItems(items.filter(item => item.id !== id)),
+  });
+  const { isHidden, remember, forget } = useHiddenMap();
+  const { showError, showUndoableAction } = useToaster();
   const { useDarkTheme } = useTheme();
 
-  React.useEffect(() => {
-    (async () => {
-      const itemsListed = await Api.listItems();
-      setItems(itemsListed);
-      setIsInitializing(false);
-    })();
-  }, []);
+  if (isError) {
+    showError(error.message);
+    return null;
+  }
 
   const handleAddNewItem = async (name) => {
-    setIsLoading(true);
     try {
-      const itemCreated = await Api.createItem({ name });
-      setItems(items.concat(itemCreated));
+      await createItem({ name });
     } catch (err) {
-      showApiError(err, showError);
-    } finally {
-      setIsLoading(false);
+      showError(resumeApiError(err));
     }
   };
 
@@ -41,47 +70,55 @@ export const App = () => {
       return;
     }
     const { name } = items[itemIndex];
-    setIsLoading(true);
     try {
-      const updatedItem = await Api.updateItem({ id, name, done });
-      setItems(items
-        .slice(0, itemIndex)
-        .concat(updatedItem)
-        .concat(items.slice(itemIndex + 1))
-      );
+      await updateItem({ id, name, done });
     } catch (err) {
-      showApiError(err, showError);
-    } finally {
-      setIsLoading(false);
+      showError(resumeApiError(err));
     }
   };
 
-  const handleDeleteItem = async (id) => {
-    setIsLoading(true);
-    try {
-      await Api.deleteItem({ id });
-      setItems(items.filter(item => item.id !== id));
-    } catch (err) {
-      showApiError(err, showError);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleDeleteItem = async (item) => {
+    remember(item.id);
+    setItems(items);
+    showUndoableAction({
+      message: `Item "${item.name}" apagado`,
+      undoAction() {
+        forget(item.id);
+        setItems(items);
+      },
+      async doAction(didTimeoutExpire) {
+        const shouldDelete = isHidden(item.id) || didTimeoutExpire;
+        if (!shouldDelete) {
+          return;
+        }
+        try {
+          await deleteItem({ id: item.id });
+          forget(item.id);
+        } catch (err) {
+          showError(resumeApiError(err));
+        }
+      },
+    });
   };
+
+  const sortedItems = items
+    .map((item) => ({
+      ...item,
+      isHidden: isHidden(item.id),
+    }))
+    .sort(byNameAsc);
 
   return (
     <div className={classNames(styles.app, {
-      [styles.appDark]: useDarkTheme,
       [Classes.DARK]: useDarkTheme,
     })}>
       <Header
         onAddNewItem={handleAddNewItem}
-        isLoading={isLoading}
       />
       <List
-        items={items}
+        items={sortedItems}
         onToggleItem={handleToggleItem}
         onDeleteItem={handleDeleteItem}
-        isLoading={isInitializing}
       />
     </div>
   );

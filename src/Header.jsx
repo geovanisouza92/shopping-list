@@ -1,20 +1,27 @@
 import { H1, InputGroup, Spinner } from '@blueprintjs/core';
+import PropTypes from 'prop-types';
 import React from 'react';
-import styles from './Header.module.css';
+import { useIsFetching } from 'react-query';
+import styles from './Header.module.scss';
 
-export const Header = ({ onAddNewItem, isLoading }) => {
+const propTypes = {
+  onAddNewItem: PropTypes.func.isRequired,
+};
+
+export const Header = ({ onAddNewItem }) => {
   const [value, setValue] = React.useState();
+  const isFetching = useIsFetching();
 
   return (
     <div>
       <div className={styles.header}>
         <H1>Shopping list</H1>
-        {isLoading && (
+        {isFetching ? (
           <Spinner
             intent="primary"
             size={25}
           />
-        )}
+        ) : null}
       </div>
       <form onSubmit={e => {
         e.preventDefault();
@@ -24,7 +31,7 @@ export const Header = ({ onAddNewItem, isLoading }) => {
         <InputGroup
           fill
           intent="primary"
-          placeholder="Item"
+          placeholder="Digite aqui"
           value={value}
           onChange={e => setValue(e.target.value)}
         />
@@ -32,3 +39,5 @@ export const Header = ({ onAddNewItem, isLoading }) => {
     </div>
   );
 };
+
+Header.propTypes = propTypes;

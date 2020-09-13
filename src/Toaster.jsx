@@ -24,5 +24,18 @@ export const useToaster = () => {
     })
   };
 
-  return [showError];
+  const showUndoableAction = ({ message, undoAction, doAction, timeout = 5000 }) => {
+    toaster.show({
+      message,
+      intent: Intent.WARNING,
+      action: {
+        text: 'Desfazer',
+        onClick: undoAction,
+      },
+      onDismiss: doAction,
+      timeout,
+    })
+  };
+
+  return { showError, showUndoableAction };
 };

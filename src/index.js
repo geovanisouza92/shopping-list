@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { App } from './App';
 import config from './aws-exports';
-import './index.css';
+import './index.scss';
 import { ThemeProvider } from './Theme';
 import { ToasterProvider } from './Toaster';
 

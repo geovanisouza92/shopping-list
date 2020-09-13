@@ -1,0 +1,13 @@
+@import "~@blueprintjs/core/lib/scss/variables";
+
+.app {
+  width: 100%;
+  max-width: 400px;
+  padding-top: 16px;
+}
+
+@media (max-width: 425px) {
+  .app {
+    padding: 16px 16px 0 16px;
+  }
+}

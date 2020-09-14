@@ -1,8 +1,7 @@
 import { Classes } from '@blueprintjs/core';
 import classNames from 'classnames';
 import React from 'react';
-import { queryCache, useMutation, useQuery } from 'react-query';
-import { Api, resumeApiError } from './api';
+import { resumeApiError, useQueries } from './Api';
 import styles from './App.module.scss';
 import { Header } from './Header';
 import { List } from './List';
@@ -27,26 +26,7 @@ const useHiddenMap = () => {
 };
 
 export const App = () => {
-  const { isError, error, data: items = [] } = useQuery('items', Api.listItems, {
-    refetchOnWindowFocus: false,
-  });
-  const setItems = (newItems) => queryCache.setQueryData('items', newItems);
-  const [createItem] = useMutation(Api.createItem, {
-    onSuccess: (createdItem) => setItems(items.concat(createdItem)),
-  });
-  const [updateItem] = useMutation(Api.updateItem, {
-    onSuccess(updatedItem) {
-      const index = items.findIndex(item => item.id === updatedItem.id);
-      if (index === -1) return;
-      const newItems = items.slice(0, index)
-        .concat(updatedItem)
-        .concat(items.slice(index + 1));
-      setItems(newItems);
-    }
-  });
-  const [deleteItem] = useMutation(Api.deleteItem, {
-    onSuccess: (_, { id }) => setItems(items.filter(item => item.id !== id)),
-  });
+  const { isError, error, items, setItems, createItem, updateItem, deleteItem } = useQueries();
   const { isHidden, remember, forget } = useHiddenMap();
   const { showError, showUndoableAction } = useToaster();
   const { useDarkTheme } = useTheme();

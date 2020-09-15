@@ -30,6 +30,7 @@ export const App = () => {
   const { isHidden, remember, forget } = useHiddenMap();
   const { showError, showUndoableAction } = useToaster();
   const { useDarkTheme } = useTheme();
+  const [filter, setFilter] = React.useState();
 
   if (isError) {
     showError(error.message);
@@ -94,9 +95,11 @@ export const App = () => {
     })}>
       <Header
         onAddNewItem={handleAddNewItem}
+        onFilterChange={setFilter}
       />
       <List
         items={sortedItems}
+        filter={filter}
         onToggleItem={handleToggleItem}
         onDeleteItem={handleDeleteItem}
       />

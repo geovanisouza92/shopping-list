@@ -1,5 +1,6 @@
 import { Button, Checkbox, ControlGroup, Intent } from '@blueprintjs/core';
 import classNames from 'classnames';
+import FuzzySearch from 'fuzzy-search';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { CSSTransition } from 'react-transition-group';
@@ -11,6 +12,7 @@ const propTypes = {
     name: PropTypes.string,
     done: PropTypes.bool,
   })).isRequired,
+  filter: PropTypes.string,
   onToggleItem: PropTypes.func.isRequired,
   onDeleteItem: PropTypes.func.isRequired,
 };
@@ -27,38 +29,51 @@ const animationClasses = {
   exitDone: styles.itemExitDone,
 };
 
-export const List = ({ items, onToggleItem, onDeleteItem }) => (
-  <ul className={styles.list}>
-    {items.map((item) => (
-      <CSSTransition
-        key={item.id}
-        in={!item.isHidden}
-        appear
-        timeout={{
-          appear: 500,
-          enter: 500,
-          exit: 300,
-        }}
-        classNames={animationClasses}
-      >
-        <ControlGroup>
-          <Checkbox
-            className={classNames(styles.checkbox, styles.root)}
-            label={item.name}
-            checked={item.done}
-            onChange={e => onToggleItem(item.id, !item.done)}
-            large
-          />
-          <Button
-            minimal
-            intent={Intent.DANGER}
-            icon="delete"
-            onClick={e => onDeleteItem(item)}
-          />
-        </ControlGroup>
-      </CSSTransition>
-    ))}
-  </ul>
-);
+export const List = ({ items, filter, onToggleItem, onDeleteItem }) => {
+  const search = React.useMemo(() => {
+    return new FuzzySearch(items, ['name'], {
+      caseSensitive: false,
+    });
+  }, [items]);
+
+  let filteredItems = items;
+  if (filter) {
+    filteredItems = search.search(filter);
+  }
+
+  return (
+    <ul className={styles.list}>
+      {filteredItems.map((item) => (
+        <CSSTransition
+          key={item.id}
+          in={!item.isHidden}
+          appear
+          timeout={{
+            appear: 500,
+            enter: 500,
+            exit: 300,
+          }}
+          classNames={animationClasses}
+        >
+          <ControlGroup>
+            <Checkbox
+              className={classNames(styles.checkbox, styles.root)}
+              label={item.name}
+              checked={item.done}
+              onChange={e => onToggleItem(item.id, !item.done)}
+              large
+            />
+            <Button
+              minimal
+              intent={Intent.DANGER}
+              icon="delete"
+              onClick={e => onDeleteItem(item)}
+            />
+          </ControlGroup>
+        </CSSTransition>
+      ))}
+    </ul>
+  );
+};
 
 List.propTypes = propTypes;

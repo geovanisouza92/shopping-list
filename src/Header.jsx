@@ -6,11 +6,24 @@ import styles from './Header.module.scss';
 
 const propTypes = {
   onAddNewItem: PropTypes.func.isRequired,
+  onFilterChange: PropTypes.func.isRequired,
 };
 
-export const Header = ({ onAddNewItem }) => {
+export const Header = ({ onAddNewItem, onFilterChange }) => {
   const [value, setValue] = React.useState();
   const isFetching = useIsFetching();
+
+  const handleValueChange = ({ target }) => {
+    setValue(target.value);
+    onFilterChange(target.value);
+  };
+
+  const handleAddNewItem = e => {
+    e.preventDefault();
+    onAddNewItem(value);
+    setValue('');
+    onFilterChange('');
+  };
 
   return (
     <>
@@ -23,17 +36,13 @@ export const Header = ({ onAddNewItem }) => {
           />
         ) : null}
       </div>
-      <form onSubmit={e => {
-        e.preventDefault();
-        onAddNewItem(value);
-        setValue('');
-      }}>
+      <form onSubmit={handleAddNewItem}>
         <InputGroup
           fill
           intent="primary"
           placeholder="Digite aqui"
           value={value}
-          onChange={e => setValue(e.target.value)}
+          onChange={handleValueChange}
         />
       </form>
     </>
